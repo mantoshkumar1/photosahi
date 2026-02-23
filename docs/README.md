@@ -1,5 +1,7 @@
 # PhotoSahi
 
+[🚀 Open PhotoSahi](https://mantoshkumar1.github.io/photosahi/)
+
 Make compliant ID photos for Indian documents in seconds.  
 Built for Indians living in Canada.
 
