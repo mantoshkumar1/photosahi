@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+  <title>PhotoSahi – Compliant ID Photos for Indians in Canada</title>
+
+  <meta name="description"
+        content="Create compliant Indian PCC photos in seconds. No studio needed." />
+
+  <link rel="icon" href="assets/favicon.ico">
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <div class="card">
+
+    <h2>PhotoSahi</h2>
+
+    <div class="tagline">
+      Make compliant ID photos for Indian documents in seconds.<br>
+      No studio. No guesswork.
+    </div>
+
+    <select id="docType"></select>
+
+    <div id="modeNote" class="note"></div>
+
+    <input type="file" id="upload" accept="image/*">
+
+    <div class="controls">
+
+      <label>Head Size</label>
+      <input type="range" id="headSlider">
+      <span id="headValue"></span>
+
+      <label>File Size</label>
+      <input type="range" id="sizeSlider">
+      <span id="sizeValue"></span>
+
+    </div>
+
+    <b id="status">COMPLIANT</b>
+
+    <canvas id="canvas"></canvas>
+
+    <button id="download">Download Photo</button>
+
+  </div>
+
+  <script src="app.js"></script>
+
+</body>
+</html>

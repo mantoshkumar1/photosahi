@@ -1,0 +1,50 @@
+body{
+  font-family:sans-serif;
+  background:#f4f6f9;
+  display:flex;
+  justify-content:center;
+  padding:30px;
+}
+
+.card{
+  background:white;
+  padding:25px;
+  border-radius:14px;
+  width:420px;
+  text-align:center;
+  box-shadow:0 10px 25px rgba(0,0,0,0.08);
+}
+
+.tagline{
+  font-size:14px;
+  color:#555;
+  margin-bottom:15px;
+}
+
+.note{
+  font-size:13px;
+  color:#888;
+  margin-bottom:10px;
+}
+
+.controls{
+  margin-top:10px;
+}
+
+select,input,button{
+  width:100%;
+  margin-top:12px;
+}
+
+canvas{
+  width:100%;
+  margin-top:15px;
+  border:1px solid #ddd;
+  background:white;
+}
+
+button{
+  padding:12px;
+  font-size:16px;
+  cursor:pointer;
+}
