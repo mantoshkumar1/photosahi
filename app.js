@@ -5,7 +5,7 @@ const DOCUMENTS = {
     w:630, h:810,
     headMin:80, headMax:85, headDefault:82,
     fileMin:10, fileMax:200, fileDefault:150,
-    note:"ICAO compliant. Auto face-width correction enabled."
+    note:"Stand 1.5 meters away. System will detect if photo is too close."
   },
 
   "OCI Card": { active:false },
@@ -21,9 +21,11 @@ const ctx = canvas.getContext("2d");
 
 const headSlider = document.getElementById("headSlider");
 const sizeSlider = document.getElementById("sizeSlider");
+const topTrimSlider = document.getElementById("topTrimSlider");
 
 const headValue = document.getElementById("headValue");
 const sizeValue = document.getElementById("sizeValue");
+const topTrimValue = document.getElementById("topTrimValue");
 
 const statusText = document.getElementById("status");
 const modeNote = document.getElementById("modeNote");
@@ -32,6 +34,15 @@ const upload = document.getElementById("upload");
 const download = document.getElementById("download");
 
 let img = new Image();
+let faceBox = null;
+
+/* Load face detection model */
+async function loadModels(){
+  await faceapi.nets.tinyFaceDetector.loadFromUri(
+    "https://cdn.jsdelivr.net/npm/face-api.js/models"
+  );
+}
+loadModels();
 
 /* Populate dropdown */
 for (let key in DOCUMENTS){
@@ -61,57 +72,51 @@ function applyConfig(){
   canvas.height = cfg.h;
 }
 
-/* Document change */
-docType.onchange = () => {
+/* Detect face */
+async function detectFace(){
 
-  const cfg = DOCUMENTS[docType.value];
+  const detection = await faceapi.detectSingleFace(
+    img,
+    new faceapi.TinyFaceDetectorOptions()
+  );
 
-  if(!cfg.active){
+  if(detection){
+    faceBox = detection.box;
 
-    modeNote.innerText =
-      "This mode is coming soon. Indian PCC is fully supported.";
+    const faceRatio = faceBox.width / img.width;
 
-    headSlider.disabled = true;
-    sizeSlider.disabled = true;
-    download.disabled = true;
-
-    statusText.innerText = "IN PROGRESS";
-    statusText.style.color = "orange";
-
-    ctx.clearRect(0,0,canvas.width,canvas.height);
-    return;
+    if(faceRatio > 0.65){
+      statusText.innerText = "❌ Too close – retake from 1.5m";
+      statusText.style.color = "red";
+    }
+    else{
+      statusText.innerText = "✅ Good distance";
+      statusText.style.color = "green";
+    }
   }
-
-  modeNote.innerText = cfg.note;
-
-  headSlider.disabled = false;
-  sizeSlider.disabled = false;
-  download.disabled = false;
-
-  statusText.innerText = "COMPLIANT";
-  statusText.style.color = "green";
-
-  applyConfig();
-  draw();
-};
-
-docType.value = "Indian PCC";
-docType.onchange();
+}
 
 /* Upload */
-upload.onchange = e => img.src = URL.createObjectURL(e.target.files[0]);
-img.onload = draw;
+upload.onchange = async e => {
+  img.src = URL.createObjectURL(e.target.files[0]);
+};
 
-/* Sliders */
-headSlider.oninput = () => {
-  headValue.innerText = headSlider.value + "%";
+img.onload = async () => {
+  await detectFace();
   draw();
 };
 
+/* Sliders */
+headSlider.oninput = () => draw();
 sizeSlider.oninput = () =>
   sizeValue.innerText = sizeSlider.value + " KB";
 
-/* DRAW — FACE WIDTH FIX */
+topTrimSlider.oninput = () => {
+  topTrimValue.innerText = topTrimSlider.value + "%";
+  draw();
+};
+
+/* Draw */
 function draw(){
 
   const cfg = DOCUMENTS[docType.value];
@@ -120,23 +125,17 @@ function draw(){
   const TARGET_W = cfg.w;
   const TARGET_H = cfg.h;
 
-  canvas.width = TARGET_W;
-  canvas.height = TARGET_H;
-
-  // Target ICAO face width ratio
-  const FACE_WIDTH_RATIO = 0.55;
-
-  // Estimate face width (works for tight selfies)
-  const estimatedFaceWidth = img.width * 0.6;
-
-  let cropWidth = estimatedFaceWidth / FACE_WIDTH_RATIO;
-
-  cropWidth = Math.min(cropWidth, img.width);
-
+  const cropWidth = img.width * 0.9;
   const cropHeight = cropWidth * (TARGET_H / TARGET_W);
 
-  const sx = (img.width - cropWidth) / 2;
-  const sy = (img.height - cropHeight) / 2;
+  const sx = (img.width - cropWidth)/2;
+
+  const topTrimPercent = topTrimSlider.value / 100;
+  let sy = (img.height - cropHeight) * topTrimPercent;
+
+  if (sy < 0) sy = 0;
+  if (sy + cropHeight > img.height)
+    sy = img.height - cropHeight;
 
   ctx.clearRect(0,0,canvas.width,canvas.height);
 

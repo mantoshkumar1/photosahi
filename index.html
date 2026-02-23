@@ -1,14 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-
   <title>PhotoSahi – Compliant ID Photos for Indians in Canada</title>
-
-  <meta name="description"
-        content="Create compliant Indian PCC photos in seconds. No studio needed." />
 
   <link rel="icon" href="assets/favicon.ico">
   <link rel="stylesheet" href="style.css">
@@ -16,49 +11,52 @@
 
 <body>
 
-  <div class="card">
+<div class="card">
 
-    <h2>PhotoSahi</h2>
+  <h2>PhotoSahi</h2>
 
-    <div class="tagline">
-      Make compliant ID photos for Indian documents in seconds.<br>
-      No studio. No guesswork.
-    </div>
+  <div class="tagline">
+    Make compliant ID photos for Indian documents in seconds.<br>
+    No studio. No guesswork.
+  </div>
 
-    <select id="docType"></select>
+  <select id="docType"></select>
 
-    <div id="modeNote" class="note"></div>
+  <div id="modeNote" class="note"></div>
 
-    <input type="file" id="upload" accept="image/*">
+  <input type="file" id="upload" accept="image/*">
 
-    <div class="controls">
+  <div class="controls">
 
-      <label>Head Size</label>
-      <input type="range" id="headSlider">
-      <span id="headValue"></span>
+    <label>Head Size</label>
+    <input type="range" id="headSlider">
+    <span id="headValue"></span>
 
-      <label>File Size</label>
-      <input type="range" id="sizeSlider">
-      <span id="sizeValue"></span>
+    <label>Top Trim (Hair Space)</label>
+    <input type="range" id="topTrimSlider" min="0" max="30" value="10">
+    <span id="topTrimValue">10%</span>
 
-    </div>
-
-    <b id="status">COMPLIANT</b>
-
-    <canvas id="canvas"></canvas>
-
-    <button id="download">Download Photo</button>
-
-    <div class="note" style="margin-top:15px;">
-  Open-source on
-  <a href="https://github.com/mantoshkumar1/photosahi" target="_blank">
-    GitHub
-  </a>
-    </div>
+    <label>File Size</label>
+    <input type="range" id="sizeSlider">
+    <span id="sizeValue"></span>
 
   </div>
 
-  <script src="app.js"></script>
+  <b id="status">COMPLIANT</b>
+
+  <canvas id="canvas"></canvas>
+
+  <button id="download">Download Photo</button>
+
+  <div class="note" style="margin-top:15px;">
+    Open-source on
+    <a href="https://github.com/mantoshkumar1/photosahi" target="_blank">GitHub</a>
+  </div>
+
+</div>
+
+<script defer src="https://cdn.jsdelivr.net/npm/face-api.js"></script>
+<script src="app.js"></script>
 
 </body>
 </html>
