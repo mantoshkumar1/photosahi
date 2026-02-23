@@ -5,7 +5,7 @@ const DOCUMENTS = {
     w:630, h:810,
     headMin:80, headMax:85, headDefault:82,
     fileMin:10, fileMax:200, fileDefault:150,
-    note:"ICAO compliant. Face must be 80–85% with white background."
+    note:"ICAO compliant. Auto face-width correction enabled."
   },
 
   "OCI Card": { active:false },
@@ -95,13 +95,11 @@ docType.onchange = () => {
   draw();
 };
 
-/* Default */
 docType.value = "Indian PCC";
 docType.onchange();
 
 /* Upload */
 upload.onchange = e => img.src = URL.createObjectURL(e.target.files[0]);
-
 img.onload = draw;
 
 /* Sliders */
@@ -113,29 +111,41 @@ headSlider.oninput = () => {
 sizeSlider.oninput = () =>
   sizeValue.innerText = sizeSlider.value + " KB";
 
-/* Draw */
+/* DRAW — FACE WIDTH FIX */
 function draw(){
 
   const cfg = DOCUMENTS[docType.value];
-  if(!cfg.active) return;
+  if(!cfg.active || !img.width) return;
 
-  const headRatio = headSlider.value/100;
+  const TARGET_W = cfg.w;
+  const TARGET_H = cfg.h;
 
-  const cropH = img.height * headRatio;
-  const cropW = cropH * (cfg.w/cfg.h);
+  canvas.width = TARGET_W;
+  canvas.height = TARGET_H;
 
-  const sx = (img.width-cropW)/2;
-  const sy = (img.height-cropH)/2;
+  // Target ICAO face width ratio
+  const FACE_WIDTH_RATIO = 0.55;
+
+  // Estimate face width (works for tight selfies)
+  const estimatedFaceWidth = img.width * 0.6;
+
+  let cropWidth = estimatedFaceWidth / FACE_WIDTH_RATIO;
+
+  cropWidth = Math.min(cropWidth, img.width);
+
+  const cropHeight = cropWidth * (TARGET_H / TARGET_W);
+
+  const sx = (img.width - cropWidth) / 2;
+  const sy = (img.height - cropHeight) / 2;
 
   ctx.clearRect(0,0,canvas.width,canvas.height);
 
   ctx.drawImage(
     img,
-    Math.max(0,sx),
-    Math.max(0,sy),
-    Math.min(cropW,img.width),
-    Math.min(cropH,img.height),
-    0,0,cfg.w,cfg.h
+    sx, sy,
+    cropWidth, cropHeight,
+    0, 0,
+    TARGET_W, TARGET_H
   );
 }
 
