@@ -53,6 +53,16 @@ Meets Passport Seva upload requirements.
 5. Download the compliant image
 
 ---
+## 🖥 How to Manually Run on Your Laptop
+
+1. cd photosahi
+2. python3 -m http.server 8080
+3. Then open in browser: http://localhost:8080
+4. To stop server: Press Ctrl + C in terminal
+
+Note: If port 8080 is busy, use 8000 or 3000 instead.
+
+---
 
 ## 🌐 Live Tool
 
