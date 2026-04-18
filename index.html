@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>PhotoSahi – Compliant ID Photos for Indians in Canada</title>
+  <title>PhotoSahi – Make compliant ID photos for Canadian/Indian applications in seconds</title>
 
   <link rel="icon" href="assets/favicon.ico">
   <link rel="stylesheet" href="style.css">
@@ -16,47 +16,77 @@
   <h2>PhotoSahi</h2>
 
   <div class="tagline">
-    Make compliant ID photos for Indian documents in seconds.<br>
-    No studio. No guesswork.
+    Perfect ID photo maker for Indian & Canadian applications—in seconds.
+  </div>
+
+  <div class="hero">
+    <div class="heroSub">
+      Supports Passport, OCI, PCC, and Canadian applications.
+    </div>
+  
   </div>
 
   <select id="docType"></select>
 
-  <div id="modeNote" class="note"></div>
-
-  <input type="file" id="upload" accept="image/*">
-
-  <div class="controls">
-
-    <label>Head Size</label>
-    <input type="range" id="headSlider">
-    <span id="headValue"></span>
-
-    <label>Top Trim (Hair Space)</label>
-    <input type="range" id="topTrimSlider" min="0" max="30" value="10">
-    <span id="topTrimValue">10%</span>
-
-    <label>File Size</label>
-    <input type="range" id="sizeSlider">
-    <span id="sizeValue"></span>
-
+  <div class="uploadRow">
+    <button id="uploadTrigger" type="button" class="uploadBtn">Choose Photo</button>
+    <div id="modeNote" class="note"></div>
+    <span class="heroTrust">Private • No uploads • No signup</span>
   </div>
+  <input type="file" id="upload" accept="image/*" hidden>
 
-  <b id="status">COMPLIANT</b>
+  <div class="layout">
 
-  <canvas id="canvas"></canvas>
-
-  <button id="download">Download Photo</button>
-
-  <div class="note" style="margin-top:15px;">
-    Open-source on
-    <a href="https://github.com/mantoshkumar1/photosahi" target="_blank">GitHub</a>
+    <!-- LEFT: Controls -->
+    <div class="controlsWrap">
+  
+      <div class="controls">
+  
+        <div class="controlHeader">
+          <label for="headSlider">Zoom Face</label>
+          <span id="headValue"></span>
+        </div>
+        <input type="range" id="headSlider">
+  
+        <div class="controlHeader">
+          <label for="topTrimSlider">Vertical Position</label>
+          <span id="topTrimValue">10%</span>
+        </div>
+        <input type="range" id="topTrimSlider" min="0" max="30" value="10">
+  
+        <div class="controlHeader">
+          <label for="sizeSlider">File Size</label>
+          <span id="sizeValue"></span>
+        </div>
+        <input type="range" id="sizeSlider">
+  
+      </div>
+  
+      <b id="status">COMPLIANT</b>
+  
+      <button id="download">Download Photo</button>
+      <div class="githubNote">
+        Open-source on 
+        <a href="https://github.com/mantoshkumar1/photosahi" target="_blank">GitHub</a>
+      </div>
+  
+    </div>
+  
+    <!-- RIGHT: Canvas -->
+    <div class="canvasWrap">
+      <canvas id="canvas"></canvas>
+  
+      <div style="font-size:10px; color:#888; margin-top:6px;">
+        Press <b>D</b> for Debug | Press <b>S</b> to Compare
+      </div>
+    </div>
+  
   </div>
 
 </div>
 
-<script defer src="https://cdn.jsdelivr.net/npm/face-api.js"></script>
-<script src="app.js"></script>
+<script defer src="assets/face-api.min.js"></script>
+<script defer src="app.js"></script>
 
 </body>
 </html>
