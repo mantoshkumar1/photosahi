@@ -34,12 +34,19 @@ const upload = document.getElementById("upload");
 const download = document.getElementById("download");
 
 let img = new Image();
+let modelsLoaded = false;
 
 /* FACE DETECTION LOAD */
 async function loadModels(){
-  await faceapi.nets.tinyFaceDetector.loadFromUri(
-    "https://cdn.jsdelivr.net/npm/face-api.js/models"
-  );
+  try{
+    await faceapi.nets.tinyFaceDetector.loadFromUri(
+      "https://cdn.jsdelivr.net/npm/face-api.js/models"
+    );
+    modelsLoaded = true;
+  } catch {
+    statusText.innerText = "We could not start face check. Please refresh the page and wait 2-3 seconds before uploading your photo.";
+    statusText.style.color = "red";
+  }
 }
 loadModels();
 
@@ -73,6 +80,11 @@ function applyConfig(){
 
 /* DISTANCE CHECK ONLY (does not affect drawing) */
 async function checkDistance(){
+  if(!modelsLoaded){
+    statusText.innerText = "Getting face checker ready... please wait a moment, then upload again if needed.";
+    statusText.style.color = "orange";
+    return;
+  }
 
   const detection = await faceapi.detectSingleFace(
     img,
@@ -80,7 +92,7 @@ async function checkDistance(){
   );
 
   if(!detection){
-    statusText.innerText = "Face not detected";
+    statusText.innerText = "We could not find your face. Use a straight front photo, good light, plain background, and keep full head visible.";
     statusText.style.color = "orange";
     return;
   }
@@ -88,10 +100,10 @@ async function checkDistance(){
   const faceRatio = detection.box.width / img.width;
 
   if(faceRatio > 0.65){
-    statusText.innerText = "❌ Too close – move 1.5m away";
+    statusText.innerText = "Your face looks too close to camera. Step back about 1 to 1.5 meters, retake the photo, then upload again.";
     statusText.style.color = "red";
   } else {
-    statusText.innerText = "COMPLIANT";
+    statusText.innerText = "Looks good. Face distance is acceptable for upload.";
     statusText.style.color = "green";
   }
 }
