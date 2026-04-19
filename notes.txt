@@ -1,0 +1,5 @@
+Notes (YYYY-MM-DD):
+
+- 2026-04-19:
+	- These models are face-detecting models and were downloaded from https://github.com/justadudewhohacks/face-api.js/tree/master/weights
+	- These model files were committed to the source code to make the application load quickly. Earlier, it was dependent on the CDN server, and these models needed to be downloaded first.
