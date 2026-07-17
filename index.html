@@ -6,7 +6,7 @@
   <title>PhotoSahi – Make compliant ID photos for Canadian/Indian applications in seconds</title>
 
   <link rel="icon" href="assets/favicon.ico">
-  <link rel="stylesheet" href="style.css?v=20260716-4">
+  <link rel="stylesheet" href="style.css?v=20260716-5">
 </head>
 
 <body>
@@ -83,6 +83,9 @@
         Open-source on 
         <a href="https://github.com/mantoshkumar1/photosahi" target="_blank">GitHub</a>
       </div>
+      <button id="feedbackTrigger" class="feedbackTrigger" type="button">
+        Send feedback
+      </button>
   
     </div>
   
@@ -103,9 +106,47 @@
 
 </div>
 
+<div id="feedbackModal" class="feedbackModal" hidden>
+  <div class="feedbackBackdrop" data-feedback-close></div>
+  <section class="feedbackDialog" role="dialog" aria-modal="true" aria-labelledby="feedbackTitle">
+    <button class="feedbackClose" type="button" aria-label="Close feedback form" data-feedback-close>×</button>
+    <h2 id="feedbackTitle">Send feedback</h2>
+    <p class="feedbackIntro">Tell us what happened or what would make PhotoSahi better.</p>
+
+    <form id="feedbackForm">
+      <label class="feedbackField" for="feedbackType">
+        <span>What is this about?</span>
+        <select id="feedbackType" name="type" required>
+          <option value="Something is broken">Something is broken</option>
+          <option value="Suggestion">I have a suggestion</option>
+          <option value="Other">Something else</option>
+        </select>
+      </label>
+
+      <label class="feedbackField" for="feedbackMessage">
+        <span>Your feedback</span>
+        <textarea id="feedbackMessage" name="message" rows="5" placeholder="What happened? What did you expect?" required></textarea>
+      </label>
+
+      <label class="feedbackField" for="feedbackEmail">
+        <span>Email <small>(optional)</small></span>
+        <input id="feedbackEmail" name="email" type="email" placeholder="Only if you want a reply">
+      </label>
+
+      <p class="feedbackPrivacy">For your privacy, your photo is not included with this feedback.</p>
+      <div id="feedbackStatus" class="feedbackStatus" role="status" aria-live="polite"></div>
+
+      <div class="feedbackActions">
+        <button class="feedbackCancel" type="button" data-feedback-close>Cancel</button>
+        <button id="feedbackSubmit" type="submit">Send feedback</button>
+      </div>
+    </form>
+  </section>
+</div>
+
 <script defer src="assets/face-api.min.js"></script>
 <script defer src="assets/heic2any.min.js"></script>
-<script defer src="app.js?v=20260716-5"></script>
+<script defer src="app.js?v=20260716-6"></script>
 
 </body>
 </html>

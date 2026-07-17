@@ -107,6 +107,15 @@
   const outputDimensions = document.getElementById("outputDimensions");
   const metadataNote = document.getElementById("metadataNote");
   const photoRequiredControls = document.querySelectorAll("[data-requires-photo]");
+  const feedbackTrigger = document.getElementById("feedbackTrigger");
+  const feedbackModal = document.getElementById("feedbackModal");
+  const feedbackForm = document.getElementById("feedbackForm");
+  const feedbackMessage = document.getElementById("feedbackMessage");
+  const feedbackStatus = document.getElementById("feedbackStatus");
+  const feedbackSubmit = document.getElementById("feedbackSubmit");
+  const feedbackCloseControls = document.querySelectorAll("[data-feedback-close]");
+
+  const FORMSPREE_ENDPOINT = "https://formspree.io/f/xeeyaazn";
   
   let img = new Image();
   let lastDetection = null;
@@ -156,6 +165,76 @@
       const disabledControl = control.querySelector(":disabled");
       if(disabledControl) showPhotoRequiredGuidance();
     });
+  });
+
+  function openFeedback(){
+    feedbackModal.hidden = false;
+    document.body.classList.add("feedbackOpen");
+    feedbackStatus.innerText = "";
+    delete feedbackStatus.dataset.tone;
+    requestAnimationFrame(()=> feedbackMessage.focus());
+  }
+
+  function closeFeedback(){
+    feedbackModal.hidden = true;
+    document.body.classList.remove("feedbackOpen");
+    feedbackTrigger.focus();
+  }
+
+  feedbackTrigger.addEventListener("click", openFeedback);
+  feedbackCloseControls.forEach(control=> control.addEventListener("click", closeFeedback));
+
+  document.addEventListener("keydown", event=>{
+    if(event.key === "Escape" && !feedbackModal.hidden){
+      closeFeedback();
+    }
+  });
+
+  feedbackForm.addEventListener("submit", async event=>{
+    event.preventDefault();
+    feedbackStatus.innerText = "";
+    delete feedbackStatus.dataset.tone;
+
+    if(!feedbackForm.reportValidity()) return;
+
+    if(!FORMSPREE_ENDPOINT){
+      feedbackStatus.innerText = "Feedback sending is being set up. Please try again soon.";
+      feedbackStatus.dataset.tone = "error";
+      return;
+    }
+
+    feedbackSubmit.disabled = true;
+    feedbackSubmit.innerText = "Sending…";
+
+    try{
+      // Only explicit text fields are sent. The selected photo and canvas are never included.
+      const formData = new FormData(feedbackForm);
+      const response = await fetch(FORMSPREE_ENDPOINT, {
+        method:"POST",
+        body:formData,
+        headers:{Accept:"application/json"}
+      });
+
+      if(!response.ok){
+        const result = await response.json().catch(()=> null);
+        const formspreeMessage = result?.errors?.map(item=> item.message).filter(Boolean).join(" ") ||
+          result?.error || "Feedback request failed";
+        throw new Error(formspreeMessage);
+      }
+
+      feedbackForm.reset();
+      feedbackStatus.innerText = "Thank you. Your feedback has been received.";
+      feedbackStatus.dataset.tone = "success";
+    }catch(error){
+      console.error("Feedback could not be sent", error);
+      feedbackStatus.innerText = error.message === "Feedback request failed"
+        ? "Feedback could not be sent. Please try again."
+        : error.message;
+      feedbackStatus.dataset.tone = "error";
+    }finally{
+      feedbackSubmit.disabled = false;
+      feedbackSubmit.innerText = "Send feedback";
+    }
   });
   
   /**
