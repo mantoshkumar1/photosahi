@@ -2,6 +2,9 @@
   "name": "photosahi",
   "private": true,
   "scripts": {
-    "test": "node --test"
+    "seo:generate": "node scripts/generate-discovery.js",
+    "seo:check": "node scripts/generate-discovery.js --check",
+    "test": "node --test",
+    "verify": "npm run seo:check && npm test"
   }
 }

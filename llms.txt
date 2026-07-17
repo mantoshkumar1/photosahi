@@ -1,0 +1,18 @@
+# PhotoSahi
+
+> Private browser-based photo preparation for passport, OCI, PCC, Canadian applications, LinkedIn and Microsoft Teams.
+
+Canonical URL: https://mantoshkumar1.github.io/photosahi/
+Source code: https://github.com/mantoshkumar1/photosahi
+Input formats: JPEG, PNG, HEIC, HEIF
+Available presets: Canadian Citizenship / Passport, Indian Passport (Reissue), Indian Passport Surrender, Indian OCI, Indian PCC, LinkedIn Profile, Microsoft Teams
+
+## Processing
+The selected photo is processed locally in the browser: local file, optional HEIC/HEIF conversion, face detection, crop and adjustment, metadata-free JPEG encoding, and local download.
+The optional feedback form sends user-entered text only and never includes the selected photo.
+
+## Limitations
+- PhotoSahi assists with sizing and framing but cannot guarantee acceptance by any receiving authority.
+- Face detection works best when the full head and both eyes are clearly visible in a front-facing photo.
+- Very large, damaged or browser-incompatible files may not open or convert.
+- Automated checks cannot validate every lighting, background, expression, recency, printing or authority-specific requirement.
