@@ -1,0 +1,7 @@
+{
+  "name": "photosahi",
+  "private": true,
+  "scripts": {
+    "test": "node --test"
+  }
+}

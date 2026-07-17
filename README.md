@@ -2,58 +2,96 @@
 
 [🚀 Open PhotoSahi](https://mantoshkumar1.github.io/photosahi/)
 
-Make compliant ID photos for Canadian/Indian applications in seconds.
+Prepare ID photos for Canadian and Indian applications in seconds.
 Built for Indians living in Canada.
 
-No studio. No guesswork. Complete Privacy.
+PhotoSahi assists with output dimensions, framing, and file size. Final acceptance is determined by the receiving authority.
 
 ---
 
-## ✅ Current Status
+## Presets available
 
-### ✔ Fully Supported
-- Indian PCC (Passport Seva / ICAO compliant)
+- Indian PCC
 - Canada Citizenship Application / Passport
 - Indian Passport Surrender
 - Indian OCI Card
 - Indian Passport (Reissue)
 - LinkedIn
-- Microsoft Team
+- Microsoft Teams
 
 
 ---
 
-## ✨ Features
+## Features
 
-- Correct pixel size output
-- ICAO head-size compliance lock
-- File size auto-adjust for portal upload
+- Preset output dimensions and framing guidance
+- Adjustable face zoom and vertical position
+- Target file-size adjustment
 - One-click download
-- Runs completely in your browser
-- No image upload to any server (privacy safe)
+- JPEG, PNG, HEIC, and HEIF input
+- Local browser processing; selected photos are not uploaded
+- Downloaded JPEGs do not retain source location or camera metadata
+- Optional text-only feedback form; photos are never attached
+
+## How your photo is processed
+
+```mermaid
+flowchart LR
+  A[Local photo] --> B{HEIC or HEIF?}
+  B -->|Yes| C[Convert in browser]
+  B -->|No| D[Face detection]
+  C --> D
+  D --> E[Crop and adjustment]
+  E --> F[Metadata-free JPEG]
+  F --> G[Local download]
+```
+
+The selected photo, converted image, face-detection result, canvas, and downloaded JPEG stay in the browser. The feedback form sends only the category, message, and optional email entered by the user.
+
+See [docs/architecture.md](docs/architecture.md) for the implementation boundary and evidence.
+
+## Supported formats and limitations
+
+- Inputs: JPEG, PNG, HEIC, and HEIF supported by the browser and bundled converter.
+- Output: JPEG using the dimensions configured for the selected preset.
+- HEIC/HEIF conversion depends on browser memory and the source file; unusually large or damaged files may fail.
+- Face detection works best with a front-facing face, the full head visible, and both eyes clear.
+- Automated checks cannot validate every lighting, background, expression, recency, printing, or authority-specific requirement.
+- A positive quality summary means only that the checks available in PhotoSahi found no actionable issue. It is not an acceptance guarantee.
 
 ---
 
-## 🖥 How to Use
+## How to use
 
 1. Open the app
 2. Select your application type, e.g; **Indian PCC**
 3. Upload your photo
-4. Adjust zoom, verifical position if needed
-5. Download the compliant image
+4. Adjust zoom or vertical position if needed
+5. Review the preview and quality guidance
+6. Download the prepared JPEG
 
 ---
-## 🖥 How to Manually Run on Your Laptop
+## Run locally
 
-1. cd photosahi
-2. python3 -m http.server 8080
-3. Then open in browser: http://localhost:8080
-4. To stop server: Press Ctrl + C in terminal
+```sh
+cd photosahi
+python3 -m http.server 8080
+```
+
+Open `http://localhost:8080`. Press `Ctrl+C` to stop the server.
+
+## Regression tests
+
+```sh
+npm test
+```
+
+The dependency-free Node test suite covers model readiness, front-facing and downward-looking detection outcomes, no-face guidance, HEIC success and failure, rapid selections, unavailable Debug/Compare behavior, and Blob-based JPEG sizing. Detection responses are mocked so tests remain deterministic and do not require committing personal photos.
 
 Note: If port 8080 is busy, use 8000 or 3000 instead.
 
 ---
 
-## 🌐 Live Tool
+## Scope
 
-(Will be available after GitHub Pages deployment)
+PhotoSahi is an assistive preparation tool, not an issuing authority or professional photo studio. Always review the current instructions from the organization receiving the photo.
