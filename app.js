@@ -491,6 +491,50 @@ function drawOriginalFitted(ctx, img, W, H){
     ctx.drawImage(img, dx, dy, drawW, drawH);
   }
 
+function drawNoFaceState(ctx, img, W, H){
+    // Always keep the uploaded photo visible when automatic detection fails.
+    drawOriginalFitted(ctx, img, W, H);
+
+    statusText.innerText =
+      "Face not detected. Use a front-facing photo with the full head and both eyes clearly visible.";
+    statusText.dataset.tone = "warning";
+
+    if(SPLIT_VIEW){
+      // Compare still has two meaningful sides instead of an unexplained blank area.
+      ctx.save();
+      ctx.fillStyle = "#f8fafc";
+      ctx.fillRect(W, 0, W, H);
+      ctx.strokeStyle = "#d1d5db";
+      ctx.beginPath();
+      ctx.moveTo(W, 0);
+      ctx.lineTo(W, H);
+      ctx.stroke();
+
+      ctx.textAlign = "center";
+      ctx.fillStyle = "#991b1b";
+      ctx.font = "bold 18px sans-serif";
+      ctx.fillText("Processed preview unavailable", W + W / 2, H / 2 - 14);
+      ctx.fillStyle = "#475569";
+      ctx.font = "14px sans-serif";
+      ctx.fillText("A front-facing photo is required.", W + W / 2, H / 2 + 14);
+      ctx.restore();
+    }
+
+    if(DEBUG){
+      // Debug cannot draw landmarks without a detection, so explain why.
+      ctx.save();
+      ctx.fillStyle = "rgba(0, 0, 0, 0.78)";
+      ctx.fillRect(8, 8, Math.min(360, W - 16), 66);
+      ctx.fillStyle = "#fca5a5";
+      ctx.font = "bold 14px sans-serif";
+      ctx.fillText("DEBUG: Face not detected", 18, 34);
+      ctx.fillStyle = "#f8fafc";
+      ctx.font = "13px sans-serif";
+      ctx.fillText("Landmarks and crop guides are unavailable.", 18, 56);
+      ctx.restore();
+    }
+  }
+
 function draw(){
   
     const cfg = DOCUMENTS[docType.value];
@@ -504,10 +548,8 @@ function draw(){
     canvas.height = H;
     ctx.clearRect(0,0,canvasW,H);
   
-    console.log(lastDetection);
-  
     if(!lastDetection){
-      ctx.drawImage(img,0,0,W,H);
+      drawNoFaceState(ctx, img, W, H);
       return;
     }
 
