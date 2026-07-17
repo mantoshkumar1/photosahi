@@ -49,6 +49,25 @@ body{
   font-size:12px;
 }
 
+.processingNote{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-wrap:wrap;
+  gap:4px 8px;
+  margin-top:8px;
+  padding:7px 10px;
+  border-radius:9px;
+  color:#64748b;
+  background:#f8fafc;
+  font-size:10px;
+  line-height:1.35;
+}
+
+.processingNote strong{
+  color:#475569;
+}
+
 select,
 button,
 input{
@@ -105,6 +124,55 @@ button:disabled{
 
 .uploadBtn:hover:not(:disabled){
   background:#1e293b;
+}
+
+.uploadBtn[aria-busy="true"]{
+  color:#e2e8f0;
+  background:#1e293b;
+  cursor:wait;
+}
+
+.photoProgress{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  min-height:30px;
+  margin:6px 0 0;
+  padding:5px 8px;
+  border:1px solid #bfdbfe;
+  border-radius:8px;
+  color:#1e40af;
+  background:#eff6ff;
+  font-size:11px;
+  font-weight:600;
+  text-align:center;
+}
+
+.photoProgress[hidden]{
+  display:none;
+}
+
+.photoProgressSpinner{
+  width:13px;
+  height:13px;
+  flex:0 0 auto;
+  border:2px solid #bfdbfe;
+  border-top-color:#2563eb;
+  border-radius:50%;
+  animation:photoProgressSpin .75s linear infinite;
+}
+
+@keyframes photoProgressSpin{
+  to{ transform:rotate(360deg); }
+}
+
+@media (prefers-reduced-motion:reduce){
+  .photoProgressSpinner{
+    animation:none;
+    border-top-color:#bfdbfe;
+    background:#2563eb;
+  }
 }
 
 #upload{
@@ -348,13 +416,7 @@ input[type="range"]:disabled{
 }
 
 .feedbackHoneypot{
-  position:absolute;
-  width:1px;
-  height:1px;
-  overflow:hidden;
-  clip:rect(0 0 0 0);
-  clip-path:inset(50%);
-  white-space:nowrap;
+  display:none;
 }
 
 .feedbackField{
@@ -548,6 +610,11 @@ canvas{
   }
 
   .privacyNote{
+    text-align:center;
+  }
+
+  .processingNote{
+    display:grid;
     text-align:center;
   }
 

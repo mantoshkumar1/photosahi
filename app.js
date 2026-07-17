@@ -56,7 +56,7 @@
   
     "Indian PCC": {
       w:600, h:600,
-      headRatio:0.52,     // slightly smaller face (safe + accepted)
+      headRatio:0.52,     // slightly smaller face for conservative framing
       upwardBias:0.04,    // mild headroom
       fileMin:10, fileMax:200, fileDefault:150,
       headDefault:100
@@ -102,6 +102,8 @@
   
   const upload = document.getElementById("upload");
   const uploadTrigger = document.getElementById("uploadTrigger");
+  const photoProgress = document.getElementById("photoProgress");
+  const photoProgressText = document.getElementById("photoProgressText");
   const download = document.getElementById("download");
   const previewMessage = document.getElementById("previewMessage");
   const outputDimensions = document.getElementById("outputDimensions");
@@ -116,11 +118,23 @@
   const feedbackCloseControls = document.querySelectorAll("[data-feedback-close]");
 
   const FORMSPREE_ENDPOINT = "https://formspree.io/f/xeeyaazn";
+
+  const {
+    convertHeicFile,
+    createModelReadiness,
+    createSelectionTracker,
+    findBestJpegBlob,
+    getNoFaceGuidance,
+    getQualitySummary,
+    getShortcutGuidance,
+    isHeicFile
+  } = window.PhotoSahiWorkflow;
   
   let img = new Image();
   let lastDetection = null;
-  let modelsLoaded = false;
-  let fileSelectionToken = 0;
+  const selections = createSelectionTracker();
+  const modelReadiness = createModelReadiness({getFaceApi:()=> window.faceapi});
+  let activeImageSelectionToken = 0;
   let activeImageUrl = null;
   
   /* =========================
@@ -132,7 +146,7 @@
   
   window.addEventListener("keydown", (e)=>{
     if(!img.width && (e.key.toLowerCase() === "d" || e.key.toLowerCase() === "s")){
-      previewMessage.innerText = "Choose a photo first to use Debug or Compare.";
+      previewMessage.innerText = getShortcutGuidance();
       return;
     }
 
@@ -377,20 +391,11 @@
   }
   
   
-  /* =========================
-     LOAD MODEL
-     ========================= */
-  
-  async function loadModels(){
-    if(!window.faceapi){
-      setTimeout(loadModels,300);
-      return;
-    }
-    await faceapi.nets.tinyFaceDetector.loadFromUri("models");
-    await faceapi.nets.faceLandmark68TinyNet.loadFromUri("models");
-    modelsLoaded = true;
-  }
-  loadModels();
+  // Start loading early. detectFace() also awaits this same promise, so an
+  // upload made during startup cannot skip detection.
+  modelReadiness.ready().catch(error=>{
+    console.error("Face models could not be loaded", error);
+  });
   
   
   /* =========================
@@ -441,60 +446,30 @@
      FACE DETECTION
      ========================= */
   
-  async function detectFace(){
-    if(!modelsLoaded) return;
-  
+  async function detectFace(image){
+    const api = await modelReadiness.ready();
     try{
-      lastDetection = await faceapi
-          .detectSingleFace(img, new faceapi.TinyFaceDetectorOptions())
+      return await api
+          .detectSingleFace(image, new api.TinyFaceDetectorOptions())
           .withFaceLandmarks(true);
-    }catch{
-      lastDetection = null;
+    }catch(error){
+      console.error("Face detection failed", error);
+      return null;
     }
   }
   
   /* =========================
      ISSUE ANALYZER 
      ========================= */
-function issue_analyzer({
-  statusText,
-  face,
-  centerX,
-  imgWidth,
-  imgHeight,
-  cropW,
-  angle,
-  noVerticalMove,
-  noZoomPossible
-}) {
-  const messages = [];
-
-  // System constraints
-  if(noVerticalMove && noZoomPossible){
-    messages.push("Framing is locked — choose a photo with more space around the head");
-  } else if(noVerticalMove){
-    messages.push("Vertical adjustment unavailable — choose a photo with more space above and below");
-  } else if(noZoomPossible){
-    messages.push("Zoom is limited — choose a photo with more space around the head");
-  }
-
-  // Face size
-  if(face){
-    const ratio = face.height / imgHeight;
-    if(ratio < 0.15) messages.push("Face is too small — zoom in or choose a closer photo");
-    else if(ratio > 0.65) messages.push("Face is too large — zoom out or choose a photo taken farther away");
-  }
-
-  if(statusText){
-    if(messages.length){
-      statusText.innerText = messages.join(" • ");
-      statusText.dataset.tone = "warning";
-    }else{
-      statusText.innerText =
-        "Photo appears suitable based on the checks available. Review the preview before downloading.";
-      statusText.dataset.tone = "success";
-    }
-  }
+function issue_analyzer({statusText, face, imgHeight, noVerticalMove, noZoomPossible}) {
+  const summary = getQualitySummary({
+    face,
+    imageHeight:imgHeight,
+    noVerticalMove,
+    noZoomPossible
+  });
+  statusText.innerText = summary.message;
+  statusText.dataset.tone = summary.tone;
 }
   /* =========================
      DRAW
@@ -616,7 +591,7 @@ function drawNoFaceState(ctx, img, W, H){
     drawOriginalFitted(ctx, img, W, H);
 
     statusText.innerText =
-      "Face not detected. Use a front-facing photo with the full head and both eyes clearly visible.";
+      getNoFaceGuidance();
     statusText.dataset.tone = "warning";
 
     if(SPLIT_VIEW){
@@ -939,13 +914,6 @@ function draw(){
      EVENTS
      ========================= */
 
-  function isHeicFile(file){
-    const type = (file.type || "").toLowerCase();
-    const name = (file.name || "").toLowerCase();
-    return type === "image/heic" || type === "image/heif" ||
-      name.endsWith(".heic") || name.endsWith(".heif");
-  }
-
   function setPhotoLoadingState(message){
     lastDetection = null;
     metadataNote.hidden = true;
@@ -954,10 +922,28 @@ function draw(){
     statusText.innerText = "";
     delete statusText.dataset.tone;
     uploadTrigger.disabled = true;
+    uploadTrigger.innerText = "Processing photo…";
+    uploadTrigger.setAttribute("aria-busy", "true");
+    photoProgress.hidden = false;
+    photoProgressText.innerText = message;
     download.disabled = true;
     headSlider.disabled = true;
     topTrimSlider.disabled = true;
     sizeSlider.disabled = true;
+  }
+
+  function updatePhotoLoadingState(message){
+    previewMessage.hidden = false;
+    previewMessage.innerText = message;
+    photoProgress.hidden = false;
+    photoProgressText.innerText = message;
+  }
+
+  function clearPhotoLoadingState(){
+    uploadTrigger.disabled = false;
+    uploadTrigger.innerText = "Choose Photo";
+    uploadTrigger.removeAttribute("aria-busy");
+    photoProgress.hidden = true;
   }
 
   function showPhotoLoadError(message){
@@ -965,12 +951,13 @@ function draw(){
     previewMessage.innerText = message;
     statusText.innerText = message;
     statusText.dataset.tone = "error";
-    uploadTrigger.disabled = false;
+    clearPhotoLoadingState();
   }
 
-  function useImageBlob(blob){
+  function useImageBlob(blob, selectionToken){
     if(activeImageUrl) URL.revokeObjectURL(activeImageUrl);
     activeImageUrl = URL.createObjectURL(blob);
+    activeImageSelectionToken = selectionToken;
     img.src = activeImageUrl;
   }
   
@@ -980,37 +967,28 @@ function draw(){
     const file = e.target.files[0];
     if(!file) return;
 
-    const selectionToken = ++fileSelectionToken;
+    const selectionToken = selections.next();
 
     try{
       if(isHeicFile(file)){
-        setPhotoLoadingState("Converting Apple photo…");
+        setPhotoLoadingState("Converting Apple photo locally…");
 
         if(typeof heic2any !== "function"){
           throw new Error("HEIC converter is unavailable");
         }
 
-        const converted = await heic2any({
-          blob: file,
-          toType: "image/jpeg",
-          quality: 0.95
-        });
+        const convertedBlob = await convertHeicFile(file, heic2any);
 
-        if(selectionToken !== fileSelectionToken) return;
+        if(!selections.isCurrent(selectionToken)) return;
 
-        const convertedBlob = Array.isArray(converted) ? converted[0] : converted;
-        if(!(convertedBlob instanceof Blob)){
-          throw new Error("HEIC conversion did not return an image");
-        }
-
-        previewMessage.innerText = "Preparing preview…";
-        useImageBlob(convertedBlob);
+        updatePhotoLoadingState("Preparing photo preview…");
+        useImageBlob(convertedBlob, selectionToken);
       }else{
-        setPhotoLoadingState("Preparing preview…");
-        useImageBlob(file);
+        setPhotoLoadingState("Opening photo locally…");
+        useImageBlob(file, selectionToken);
       }
     }catch(error){
-      if(selectionToken !== fileSelectionToken) return;
+      if(!selections.isCurrent(selectionToken)) return;
       console.error("Photo could not be opened", error);
       upload.value = "";
       showPhotoLoadError("This Apple photo could not be opened. Try another HEIC photo or convert it to JPEG.");
@@ -1018,12 +996,24 @@ function draw(){
   };
   
   img.onload = async ()=>{
-    previewMessage.hidden = false;
-    previewMessage.innerText = "Checking photo…";
-    await detectFace();
-    uploadTrigger.disabled = false;
-    previewMessage.hidden = true;
-    draw();
+    const selectionToken = activeImageSelectionToken;
+    updatePhotoLoadingState("Checking face and framing…");
+    try{
+      const detection = await detectFace(img);
+      if(!selections.isCurrent(selectionToken) || selectionToken !== activeImageSelectionToken) return;
+      lastDetection = detection;
+      clearPhotoLoadingState();
+      previewMessage.hidden = true;
+      draw();
+    }catch(error){
+      if(!selections.isCurrent(selectionToken) || selectionToken !== activeImageSelectionToken) return;
+      console.error("Face checks could not start", error);
+      clearPhotoLoadingState();
+      drawOriginalFitted(ctx, img, canvas.width, canvas.height);
+      previewMessage.hidden = true;
+      statusText.innerText = "Face checks could not start. Refresh the page and try again.";
+      statusText.dataset.tone = "error";
+    }
   };
 
   img.onerror = ()=>{
@@ -1058,11 +1048,8 @@ function draw(){
      DOWNLOAD
      ========================= */
 
-/**
- * Returns JPEG dataURL of the processed image only.
- * If split view is on, it extracts the right half.
- */
-function getProcessedDataURL(canvas, W, H, quality, SPLIT_VIEW){
+/** Returns a canvas containing only the processed output. */
+function getProcessedCanvas(canvas, W, H, SPLIT_VIEW){
     const exportCanvas = document.createElement("canvas");
     const ectx = exportCanvas.getContext("2d");
 
@@ -1080,57 +1067,56 @@ function getProcessedDataURL(canvas, W, H, quality, SPLIT_VIEW){
       W, H         // dest size
     );
 
-    return exportCanvas.toDataURL("image/jpeg", quality);
+    return exportCanvas;
   }
 
-  download.onclick = ()=>{
+  download.onclick = async ()=>{
 
     const cfg = DOCUMENTS[docType.value];
     const W = cfg.w;
     const H = cfg.h;
   
-    const targetKB = sizeSlider.value;
-  
-    const sizeOf = (d)=>(d.length*3/4)/1024;
-  
-    function render(q){
-      const url = getProcessedDataURL(canvas, W, H, q, SPLIT_VIEW);
-      return {url, size:sizeOf(url)};
-    }
-  
-    let low=0.4, high=0.95, best=null;
-  
-    for(let i=0;i<12;i++){
-      const mid=(low+high)/2;
-      const r=render(mid);
-  
-      if(!best || Math.abs(r.size-targetKB)<Math.abs(best.size-targetKB)){
-        best=r;
+    const targetKB = Number(sizeSlider.value);
+    const exportCanvas = getProcessedCanvas(canvas, W, H, SPLIT_VIEW);
+    const downloadSelectionToken = selections.current();
+    download.disabled = true;
+    download.innerText = "Preparing download…";
+
+    try{
+      const best = await findBestJpegBlob(exportCanvas, targetKB);
+      if(!selections.isCurrent(downloadSelectionToken)) return;
+      const link = document.createElement("a");
+
+      // ===== SMART FILE NAME starts here =====
+
+      // original file name (without extension)
+      let originalName = "image";
+      if(upload && upload.files && upload.files[0]){
+        originalName = upload.files[0].name.replace(/\.[^/.]+$/, "");
       }
-  
-      if(r.size>targetKB) high=mid;
-      else low=mid;
-    }
-  
-    const link=document.createElement("a");
 
-    // ===== SMART FILE NAME starts here =====
-
-    // original file name (without extension)
-    let originalName = "image";
-    if(upload && upload.files && upload.files[0]){
-      originalName = upload.files[0].name.replace(/\.[^/.]+$/, "");
-    }
-
-    // document type (cleaned)
-    const docName = docType.value.replace(/[\/]/g, "").replace(/\s+/g, "_").toLowerCase();
+      // document type (cleaned)
+      const docName = docType.value.replace(/[\/]/g, "").replace(/\s+/g, "_").toLowerCase();
 
     // final name
-    link.download = `photosahi_${docName}_${originalName}.jpg`;
-    // ===== SMART FILE NAME ends here =====
+      link.download = `photosahi_${docName}_${originalName}.jpg`;
+      // ===== SMART FILE NAME ends here =====
 
-    link.href=best.url;
-    link.click();
+      const downloadUrl = URL.createObjectURL(best.blob);
+      link.href = downloadUrl;
+      link.click();
+      setTimeout(()=> URL.revokeObjectURL(downloadUrl), 1000);
+    }catch(error){
+      if(!selections.isCurrent(downloadSelectionToken)) return;
+      console.error("Photo download failed", error);
+      statusText.innerText = "The photo could not be prepared for download. Please try again.";
+      statusText.dataset.tone = "error";
+    }finally{
+      if(selections.isCurrent(downloadSelectionToken)){
+        download.disabled = !lastDetection;
+        download.innerText = "Download Photo";
+      }
+    }
   };
   
   
@@ -1141,8 +1127,18 @@ function getProcessedDataURL(canvas, W, H, quality, SPLIT_VIEW){
   docType.onchange = async ()=>{
     applyConfig();
     if(img.width){
-      await detectFace();
-      draw();
+      const selectionToken = selections.current();
+      try{
+        const detection = await detectFace(img);
+        if(!selections.isCurrent(selectionToken)) return;
+        lastDetection = detection;
+        draw();
+      }catch(error){
+        if(!selections.isCurrent(selectionToken)) return;
+        console.error("Face checks could not start", error);
+        statusText.innerText = "Face checks could not start. Refresh the page and try again.";
+        statusText.dataset.tone = "error";
+      }
     }
   };
   
