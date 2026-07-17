@@ -1,50 +1,344 @@
+*{
+  box-sizing:border-box;
+}
+
 body{
-  font-family:sans-serif;
-  background:#f4f6f9;
+  margin:0;
+  padding:16px;
+  min-height:100vh;
   display:flex;
   justify-content:center;
-  padding:30px;
+  font-family:Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color:#1f2937;
+  background:linear-gradient(180deg,#f7f9fc 0%,#eef3f9 100%);
 }
 
 .card{
-  background:white;
-  padding:25px;
-  border-radius:14px;
-  width:420px;
+  width:100%;
+  max-width:1000px;
+  padding:18px 20px;
   text-align:center;
-  box-shadow:0 10px 25px rgba(0,0,0,0.08);
+  background:#fff;
+  border:1px solid #e5e7eb;
+  border-radius:16px;
+  box-shadow:0 14px 35px rgba(15,23,42,.09);
+}
+
+.appHeader{
+  text-align:center;
+}
+
+.brandRow h2{
+  margin:0 0 5px;
+  font-size:25px;
+  line-height:1.2;
 }
 
 .tagline{
+  margin:0;
+  color:#4b5563;
   font-size:14px;
-  color:#555;
-  margin-bottom:15px;
 }
 
-.note{
-  font-size:13px;
-  color:#888;
-  margin-bottom:10px;
+.hero{
+  margin-top:3px;
 }
 
-.controls{
-  margin-top:10px;
+.heroSub{
+  color:#6b7280;
+  font-size:12px;
 }
 
-select,input,button{
+select,
+button,
+input{
   width:100%;
-  margin-top:12px;
 }
 
-canvas{
-  width:100%;
-  margin-top:15px;
-  border:1px solid #ddd;
-  background:white;
+select{
+  min-height:36px;
+  padding:0 10px;
+  border:1px solid #cbd5e1;
+  border-radius:9px;
+  color:#1f2937;
+  background:#fff;
+  font:inherit;
 }
 
 button{
-  padding:12px;
+  min-height:42px;
+  padding:10px 14px;
+  border:0;
+  border-radius:10px;
+  color:#fff;
+  background:#2563eb;
   font-size:16px;
+  font-weight:600;
   cursor:pointer;
+  transition:background .2s, box-shadow .2s, transform .15s;
+}
+
+button:hover:not(:disabled){
+  background:#1d4ed8;
+  box-shadow:0 8px 18px rgba(37,99,235,.22);
+}
+
+button:active:not(:disabled){
+  transform:translateY(1px);
+}
+
+button:disabled{
+  color:#64748b;
+  background:#e2e8f0;
+  cursor:not-allowed;
+}
+
+.uploadBtn{
+  width:100%;
+  min-height:36px;
+  margin-top:10px;
+  padding:7px 14px;
+  white-space:nowrap;
+  background:#0f172a;
+  font-size:13px;
+}
+
+.uploadBtn:hover:not(:disabled){
+  background:#1e293b;
+}
+
+#upload{
+  display:none !important;
+}
+
+.layout{
+  display:grid;
+  grid-template-columns:370px minmax(0,1fr);
+  gap:22px;
+  align-items:start;
+  margin-top:12px;
+}
+
+.controlsWrap{
+  min-width:0;
+  text-align:left;
+}
+
+.documentField{
+  display:grid;
+  gap:6px;
+  color:#475569;
+  font-size:12px;
+  font-weight:600;
+}
+
+.privacyNote{
+  margin:8px 0 12px;
+  color:#64748b;
+  font-size:12px;
+}
+
+.privacyNote span,
+.shortcutHint span{
+  padding:0 3px;
+  color:#94a3b8;
+}
+
+.note{
+  margin-bottom:2px;
+  color:#64748b;
+  font-size:12px;
+}
+
+.note:empty{
+  display:none;
+}
+
+.controls{
+  display:grid;
+  gap:10px;
+}
+
+.controlItem{
+  display:grid;
+  grid-template-columns:155px minmax(0,1fr);
+  align-items:center;
+  gap:12px;
+  min-height:38px;
+}
+
+.controlHeader{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  color:#374151;
+  font-size:14px;
+}
+
+.controlHeader span{
+  font-weight:600;
+}
+
+input[type="range"]{
+  margin:0;
+  accent-color:#2563eb;
+}
+
+input[type="range"]:disabled{
+  opacity:.45;
+  cursor:not-allowed;
+}
+
+#status{
+  display:flex;
+  width:100%;
+  align-items:center;
+  justify-content:center;
+  margin-top:12px;
+  padding:8px 10px;
+  border:1px solid transparent;
+  border-radius:10px;
+  font-size:12px;
+  line-height:1.25;
+  text-align:center;
+}
+
+#status:empty{
+  display:none;
+}
+
+#status[data-tone="success"]{
+  color:#166534;
+  background:#dcfce7;
+  border-color:#86efac;
+}
+
+#status[data-tone="warning"]{
+  color:#92400e;
+  background:#fef3c7;
+  border-color:#fcd34d;
+}
+
+#status[data-tone="error"]{
+  color:#991b1b;
+  background:#fee2e2;
+  border-color:#fca5a5;
+}
+
+#download{
+  margin-top:0;
+}
+
+.downloadArea{
+  margin-top:12px;
+}
+
+.githubNote{
+  margin-top:9px;
+  color:#6b7280;
+  font-size:12px;
+  text-align:center;
+}
+
+.githubNote a{
+  color:#2563eb;
+  font-weight:600;
+  text-decoration:none;
+}
+
+.githubNote a:hover{
+  text-decoration:underline;
+}
+
+.canvasWrap{
+  width:fit-content;
+  max-width:100%;
+  min-width:0;
+  margin:0 auto;
+}
+
+.previewHeader{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  min-height:20px;
+  margin-bottom:6px;
+  color:#64748b;
+  font-size:12px;
+}
+
+.previewHeader > span:first-child{
+  font-weight:600;
+  color:#475569;
+}
+
+.shortcutHint{
+  margin-left:auto;
+  text-align:right;
+}
+
+.previewStage{
+  position:relative;
+}
+
+.previewMessage{
+  position:absolute;
+  inset:0;
+  display:grid;
+  place-items:center;
+  padding:24px;
+  color:#64748b;
+  font-size:14px;
+  text-align:center;
+  pointer-events:none;
+}
+
+.previewMessage[hidden]{
+  display:none;
+}
+
+canvas{
+  display:block;
+  width:auto;
+  max-width:100%;
+  max-height:calc(100vh - 250px);
+  height:auto;
+  margin:0 auto;
+  border:1px solid #cbd5e1;
+  border-radius:12px;
+  background:#f8fafc;
+}
+
+@media (max-width:768px){
+  body{
+    padding:8px;
+  }
+
+  .card{
+    padding:14px;
+  }
+
+  .layout{
+    grid-template-columns:1fr;
+  }
+
+  .controlItem{
+    grid-template-columns:1fr;
+    gap:4px;
+  }
+
+  .privacyNote{
+    text-align:center;
+  }
+
+  .canvasWrap{
+    margin-top:4px;
+  }
+
+  canvas{
+    width:100%;
+    max-height:none;
+  }
 }

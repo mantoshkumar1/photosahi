@@ -3,60 +3,105 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>PhotoSahi – Compliant ID Photos for Indians in Canada</title>
+  <title>PhotoSahi – Make compliant ID photos for Canadian/Indian applications in seconds</title>
 
   <link rel="icon" href="assets/favicon.ico">
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css?v=20260716-3">
 </head>
 
 <body>
 
 <div class="card">
 
-  <h2>PhotoSahi</h2>
+  <header class="appHeader">
+    <div class="brandRow">
+      <h2>PhotoSahi</h2>
+      <div class="tagline">
+        Perfect ID photo maker for Indian & Canadian applications—in seconds.
+      </div>
+    </div>
 
-  <div class="tagline">
-    Make compliant ID photos for Indian documents in seconds.<br>
-    No studio. No guesswork.
-  </div>
+    <div class="hero">
+      <div class="heroSub">
+        Supports Passport, OCI, PCC, and Canadian applications.
+      </div>
+    </div>
+  </header>
 
-  <select id="docType"></select>
+  <input type="file" id="upload" accept="image/*" hidden>
 
-  <div id="modeNote" class="note"></div>
+  <div class="layout">
 
-  <input type="file" id="upload" accept="image/*">
+    <!-- LEFT: Controls -->
+    <div class="controlsWrap">
+      <label class="documentField" for="docType">
+        <span>Document type</span>
+        <select id="docType"></select>
+      </label>
+      <button id="uploadTrigger" type="button" class="uploadBtn">Choose Photo</button>
 
-  <div class="controls">
+      <div class="privacyNote">
+        Private <span>•</span> No uploads <span>•</span> No signup
+      </div>
+      <div id="modeNote" class="note"></div>
+  
+      <div class="controls">
+        <div class="controlItem" data-requires-photo>
+          <div class="controlHeader">
+            <label for="headSlider">Zoom Face</label>
+            <span id="headValue"></span>
+          </div>
+          <input type="range" id="headSlider" disabled>
+        </div>
 
-    <label>Head Size</label>
-    <input type="range" id="headSlider">
-    <span id="headValue"></span>
+        <div class="controlItem" data-requires-photo>
+          <div class="controlHeader">
+            <label for="topTrimSlider">Vertical Position</label>
+            <span id="topTrimValue">10%</span>
+          </div>
+          <input type="range" id="topTrimSlider" min="0" max="30" value="10" disabled>
+        </div>
 
-    <label>Top Trim (Hair Space)</label>
-    <input type="range" id="topTrimSlider" min="0" max="30" value="10">
-    <span id="topTrimValue">10%</span>
+        <div class="controlItem" data-requires-photo>
+          <div class="controlHeader">
+            <label for="sizeSlider">File Size</label>
+            <span id="sizeValue"></span>
+          </div>
+          <input type="range" id="sizeSlider" disabled>
+        </div>
+      </div>
+  
+      <b id="status"></b>
+  
+      <div class="downloadArea" data-requires-photo>
+        <button id="download" disabled>Download Photo</button>
+      </div>
+      <div class="githubNote">
+        Open-source on 
+        <a href="https://github.com/mantoshkumar1/photosahi" target="_blank">GitHub</a>
+      </div>
+  
+    </div>
+  
+    <!-- RIGHT: Canvas -->
+    <div class="canvasWrap">
+      <div class="previewHeader">
+        <span>Preview</span>
+        <span class="shortcutHint"><b>D</b> Debug <span>•</span> <b>S</b> Compare</span>
+      </div>
 
-    <label>File Size</label>
-    <input type="range" id="sizeSlider">
-    <span id="sizeValue"></span>
-
-  </div>
-
-  <b id="status">COMPLIANT</b>
-
-  <canvas id="canvas"></canvas>
-
-  <button id="download">Download Photo</button>
-
-  <div class="note" style="margin-top:15px;">
-    Open-source on
-    <a href="https://github.com/mantoshkumar1/photosahi" target="_blank">GitHub</a>
+      <div class="previewStage">
+        <canvas id="canvas"></canvas>
+        <div id="previewMessage" class="previewMessage">Choose a photo to preview</div>
+      </div>
+    </div>
+  
   </div>
 
 </div>
 
-<script defer src="https://cdn.jsdelivr.net/npm/face-api.js"></script>
-<script src="app.js"></script>
+<script defer src="assets/face-api.min.js"></script>
+<script defer src="app.js?v=20260716-1"></script>
 
 </body>
 </html>

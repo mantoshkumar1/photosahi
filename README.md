@@ -2,10 +2,10 @@
 
 [🚀 Open PhotoSahi](https://mantoshkumar1.github.io/photosahi/)
 
-Make compliant ID photos for Indian documents in seconds.  
+Make compliant ID photos for Canadian/Indian applications in seconds.
 Built for Indians living in Canada.
 
-No studio. No guesswork. 100% browser-based.
+No studio. No guesswork. Complete Privacy.
 
 ---
 
@@ -13,12 +13,13 @@ No studio. No guesswork. 100% browser-based.
 
 ### ✔ Fully Supported
 - Indian PCC (Passport Seva / ICAO compliant)
-
-### 🚧 Coming Soon
-- OCI Card
+- Canada Citizenship Application / Passport
+- Indian Passport Surrender
+- Indian OCI Card
 - Indian Passport (Reissue)
-- Passport Surrender
-- Canada Passport
+- LinkedIn
+- Microsoft Team
+
 
 ---
 
@@ -33,23 +34,12 @@ No studio. No guesswork. 100% browser-based.
 
 ---
 
-## 📐 Indian PCC Photo Output
-
-- Size: **630 × 810 px**
-- Face height: **80–85%**
-- File size: **10 KB – 200 KB**
-- Format: **JPEG**
-
-Meets Passport Seva upload requirements.
-
----
-
 ## 🖥 How to Use
 
 1. Open the app
-2. Select **Indian PCC**
+2. Select your application type, e.g; **Indian PCC**
 3. Upload your photo
-4. Adjust head size if needed
+4. Adjust zoom, verifical position if needed
 5. Download the compliant image
 
 ---
