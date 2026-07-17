@@ -305,6 +305,17 @@ input[type="range"]:disabled{
   display:none;
 }
 
+.metadataNote{
+  margin-top:7px;
+  color:#64748b;
+  font-size:11px;
+  text-align:center;
+}
+
+.metadataNote[hidden]{
+  display:none;
+}
+
 canvas{
   display:block;
   width:auto;
