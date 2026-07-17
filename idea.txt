@@ -1,0 +1,8 @@
+Premium features:
+------------------------
+1. Allow user to change background
+2. Allow user to change brightness
+3. In end, let know user know if resultant pic is accepted or ask for a new file.
+4. Allow user to leave comment.
+
+
