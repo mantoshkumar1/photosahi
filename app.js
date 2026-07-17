@@ -1,84 +1,4 @@
-/* =========================
-   DOCUMENT CONFIG
-   ========================= */
-
-   const DOCUMENTS = {
-
-    "Canadian Citizenship / Passport": {
-      w:600, h:840, 
-      // Output image size in pixels (aspect ratio must match real spec: 50x70 mm → 5:7)
-
-      headRatio:0.48,     
-      // Ratio of head height (chin → crown) relative to total image height
-      // Example: 0.48 means head occupies 48% of final image height
-      // Canada spec: 31–36 mm out of 70 mm → ~0.44–0.51
-
-      upwardBias:0.12,    
-      // Controls vertical placement of head inside frame
-      // Higher value → more space above head (moves face slightly downward)
-      // Lower value → centers face more
-      // Canada needs noticeable top margin → hence higher value
-
-      fileMin:60, fileMax:240, fileDefault:150,
-      // File size constraints in KB
-      // Used to auto-adjust JPEG compression during download
-
-      headDefault:100
-      // Default zoom level (%)
-      // 100 = use exact computed headRatio
-      // >100 = zoom in (larger face)
-      // <100 = zoom out (smaller face)
-    },
-
-    "Indian Passport (Reissue)": {
-      w:600, h:600,
-      headRatio:0.58,     // ✅ accurate midpoint of spec range
-      upwardBias:0.06,    // slight top margin (India less strict than Canada)
-      fileMin:10, fileMax:500, fileDefault:200,
-      headDefault:100
-    },
-
-    "Indian Passport Surrender": {
-      w:600, h:600,
-      headRatio:0.55,     // slightly smaller than passport (safer)
-      upwardBias:0.05,    // mild top margin
-      fileMin:10, fileMax:500, fileDefault:200,
-      headDefault:100
-    },
-
-    "Indian OCI": {
-      w:600, h:600,
-      headRatio:0.75,     // ✅ balanced within 70–80% range
-      upwardBias:0.02,    // very little top space (OCI prefers centered)
-      fileMin:10, fileMax:500, fileDefault:200,
-      headDefault:100
-    },
-  
-    "Indian PCC": {
-      w:600, h:600,
-      headRatio:0.52,     // slightly smaller face for conservative framing
-      upwardBias:0.04,    // mild headroom
-      fileMin:10, fileMax:200, fileDefault:150,
-      headDefault:100
-    },
-
-    "LinkedIn Profile": {
-      w:800, h:800,
-      headRatio:0.88,      // strong face presence
-      upwardBias:0.02,     // almost centered (less passport bias)
-      fileMin:50, fileMax:500, fileDefault:200,
-      headDefault:110
-    },
-
-    "Microsoft Teams": {
-      w:800, h:800,
-      headRatio:0.75,      // slightly smaller face (video-call feel)
-      upwardBias:0.06,     // more headroom (natural framing)
-      fileMin:50, fileMax:500, fileDefault:200,
-      headDefault:100
-    },
-
-  };
+const DOCUMENTS = window.PhotoSahiConfig.documents;
   
   
   /* =========================
@@ -118,6 +38,8 @@
   const feedbackCloseControls = document.querySelectorAll("[data-feedback-close]");
 
   const FORMSPREE_ENDPOINT = "https://formspree.io/f/xeeyaazn";
+
+  upload.accept = window.PhotoSahiConfig.discovery.inputAccept;
 
   const {
     convertHeicFile,

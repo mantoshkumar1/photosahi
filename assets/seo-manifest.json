@@ -1,0 +1,11 @@
+{
+  "generatedBy": "npm run seo:generate",
+  "sourceHash": "912d44f2786e724485c28e8458cc190ae86231efa1a9b3d2e6f387fe701d0057",
+  "lastModified": "2026-07-17",
+  "generatedFiles": [
+    "index.html",
+    "robots.txt",
+    "sitemap.xml",
+    "llms.txt"
+  ]
+}
