@@ -28,7 +28,7 @@
     </div>
   </header>
 
-  <input type="file" id="upload" accept="image/*" hidden>
+  <input type="file" id="upload" accept="image/*,.heic,.heif,image/heic,image/heif" hidden>
 
   <div class="layout">
 
@@ -77,7 +77,7 @@
         <button id="download" disabled>Download Photo</button>
       </div>
       <div id="metadataNote" class="metadataNote" hidden>
-        For your privacy, the downloaded photo does not retain location or camera metadata.
+        For your privacy, location and camera metadata are removed.
       </div>
       <div class="githubNote">
         Open-source on 
@@ -104,7 +104,8 @@
 </div>
 
 <script defer src="assets/face-api.min.js"></script>
-<script defer src="app.js?v=20260716-4"></script>
+<script defer src="assets/heic2any.min.js"></script>
+<script defer src="app.js?v=20260716-5"></script>
 
 </body>
 </html>
