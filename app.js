@@ -105,6 +105,7 @@
   const download = document.getElementById("download");
   const previewMessage = document.getElementById("previewMessage");
   const outputDimensions = document.getElementById("outputDimensions");
+  const metadataNote = document.getElementById("metadataNote");
   const photoRequiredControls = document.querySelectorAll("[data-requires-photo]");
   
   let img = new Image();
@@ -533,6 +534,7 @@ function drawNoFaceState(ctx, img, W, H){
     headSlider.disabled = true;
     topTrimSlider.disabled = true;
     sizeSlider.disabled = true;
+    metadataNote.hidden = true;
     drawOriginalFitted(ctx, img, W, H);
 
     statusText.innerText =
@@ -598,6 +600,7 @@ function draw(){
     headSlider.disabled = false;
     topTrimSlider.disabled = false;
     sizeSlider.disabled = false;
+    metadataNote.hidden = false;
 
     if(SPLIT_VIEW){
       // LEFT: original
@@ -863,6 +866,7 @@ function draw(){
   upload.onchange = e=>{
     const file = e.target.files[0];
     if(!file) return;
+    metadataNote.hidden = true;
     img.src = URL.createObjectURL(file);
   };
   
