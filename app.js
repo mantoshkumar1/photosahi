@@ -111,6 +111,8 @@
   let img = new Image();
   let lastDetection = null;
   let modelsLoaded = false;
+  let fileSelectionToken = 0;
+  let activeImageUrl = null;
   
   /* =========================
      DEBUG MODE
@@ -860,20 +862,96 @@ function draw(){
   /* =========================
      EVENTS
      ========================= */
+
+  function isHeicFile(file){
+    const type = (file.type || "").toLowerCase();
+    const name = (file.name || "").toLowerCase();
+    return type === "image/heic" || type === "image/heif" ||
+      name.endsWith(".heic") || name.endsWith(".heif");
+  }
+
+  function setPhotoLoadingState(message){
+    lastDetection = null;
+    metadataNote.hidden = true;
+    previewMessage.hidden = false;
+    previewMessage.innerText = message;
+    statusText.innerText = "";
+    delete statusText.dataset.tone;
+    uploadTrigger.disabled = true;
+    download.disabled = true;
+    headSlider.disabled = true;
+    topTrimSlider.disabled = true;
+    sizeSlider.disabled = true;
+  }
+
+  function showPhotoLoadError(message){
+    previewMessage.hidden = false;
+    previewMessage.innerText = message;
+    statusText.innerText = message;
+    statusText.dataset.tone = "error";
+    uploadTrigger.disabled = false;
+  }
+
+  function useImageBlob(blob){
+    if(activeImageUrl) URL.revokeObjectURL(activeImageUrl);
+    activeImageUrl = URL.createObjectURL(blob);
+    img.src = activeImageUrl;
+  }
   
   uploadTrigger.onclick = ()=> upload.click();
   
-  upload.onchange = e=>{
+  upload.onchange = async e=>{
     const file = e.target.files[0];
     if(!file) return;
-    metadataNote.hidden = true;
-    img.src = URL.createObjectURL(file);
+
+    const selectionToken = ++fileSelectionToken;
+
+    try{
+      if(isHeicFile(file)){
+        setPhotoLoadingState("Converting Apple photo…");
+
+        if(typeof heic2any !== "function"){
+          throw new Error("HEIC converter is unavailable");
+        }
+
+        const converted = await heic2any({
+          blob: file,
+          toType: "image/jpeg",
+          quality: 0.95
+        });
+
+        if(selectionToken !== fileSelectionToken) return;
+
+        const convertedBlob = Array.isArray(converted) ? converted[0] : converted;
+        if(!(convertedBlob instanceof Blob)){
+          throw new Error("HEIC conversion did not return an image");
+        }
+
+        previewMessage.innerText = "Preparing preview…";
+        useImageBlob(convertedBlob);
+      }else{
+        setPhotoLoadingState("Preparing preview…");
+        useImageBlob(file);
+      }
+    }catch(error){
+      if(selectionToken !== fileSelectionToken) return;
+      console.error("Photo could not be opened", error);
+      upload.value = "";
+      showPhotoLoadError("This Apple photo could not be opened. Try another HEIC photo or convert it to JPEG.");
+    }
   };
   
   img.onload = async ()=>{
-    previewMessage.hidden = true;
+    previewMessage.hidden = false;
+    previewMessage.innerText = "Checking photo…";
     await detectFace();
+    uploadTrigger.disabled = false;
+    previewMessage.hidden = true;
     draw();
+  };
+
+  img.onerror = ()=>{
+    showPhotoLoadError("This photo could not be opened. Try a JPEG, PNG, HEIC, or HEIF file.");
   };
   
   headSlider.oninput = ()=>{
