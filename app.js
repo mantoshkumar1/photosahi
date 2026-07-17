@@ -104,6 +104,7 @@
   const uploadTrigger = document.getElementById("uploadTrigger");
   const download = document.getElementById("download");
   const previewMessage = document.getElementById("previewMessage");
+  const outputDimensions = document.getElementById("outputDimensions");
   const photoRequiredControls = document.querySelectorAll("[data-requires-photo]");
   
   let img = new Image();
@@ -331,6 +332,8 @@
   function applyConfig(){
   
     const cfg = DOCUMENTS[docType.value];
+
+    outputDimensions.innerText = `· ${cfg.w} × ${cfg.h} px`;
   
     canvas.width = cfg.w;
     canvas.height = cfg.h;
