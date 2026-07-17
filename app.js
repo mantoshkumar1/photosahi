@@ -103,6 +103,8 @@
   const upload = document.getElementById("upload");
   const uploadTrigger = document.getElementById("uploadTrigger");
   const download = document.getElementById("download");
+  const previewMessage = document.getElementById("previewMessage");
+  const photoRequiredControls = document.querySelectorAll("[data-requires-photo]");
   
   let img = new Image();
   let lastDetection = null;
@@ -116,6 +118,11 @@
   let SPLIT_VIEW = false; // default OFF (set trye if you want it on by default)
   
   window.addEventListener("keydown", (e)=>{
+    if(!img.width && (e.key.toLowerCase() === "d" || e.key.toLowerCase() === "s")){
+      previewMessage.innerText = "Choose a photo first to use Debug or Compare.";
+      return;
+    }
+
     if(e.key.toLowerCase() === "d"){
       DEBUG = !DEBUG;
       draw();
@@ -124,6 +131,27 @@
       SPLIT_VIEW = !SPLIT_VIEW;
       draw();
     }
+  });
+
+  function showPhotoRequiredGuidance(){
+    if(!img.width){
+      previewMessage.hidden = false;
+      previewMessage.innerText = "Choose a photo first to use these controls.";
+      return;
+    }
+
+    if(!lastDetection){
+      statusText.innerText =
+        "These controls need a detectable, front-facing face. Choose another photo to continue.";
+      statusText.dataset.tone = "warning";
+    }
+  }
+
+  photoRequiredControls.forEach(control=>{
+    control.addEventListener("pointerdown", ()=>{
+      const disabledControl = control.querySelector(":disabled");
+      if(disabledControl) showPhotoRequiredGuidance();
+    });
   });
   
   /**
@@ -493,6 +521,10 @@ function drawOriginalFitted(ctx, img, W, H){
 
 function drawNoFaceState(ctx, img, W, H){
     // Always keep the uploaded photo visible when automatic detection fails.
+    download.disabled = true;
+    headSlider.disabled = true;
+    topTrimSlider.disabled = true;
+    sizeSlider.disabled = true;
     drawOriginalFitted(ctx, img, W, H);
 
     statusText.innerText =
@@ -512,11 +544,12 @@ function drawNoFaceState(ctx, img, W, H){
 
       ctx.textAlign = "center";
       ctx.fillStyle = "#991b1b";
-      ctx.font = "bold 18px sans-serif";
-      ctx.fillText("Processed preview unavailable", W + W / 2, H / 2 - 14);
+      ctx.font = "bold 28px sans-serif";
+      ctx.fillText("Processed preview", W + W / 2, H / 2 - 30);
+      ctx.fillText("unavailable", W + W / 2, H / 2 + 4);
       ctx.fillStyle = "#475569";
-      ctx.font = "14px sans-serif";
-      ctx.fillText("A front-facing photo is required.", W + W / 2, H / 2 + 14);
+      ctx.font = "18px sans-serif";
+      ctx.fillText("A front-facing photo is required.", W + W / 2, H / 2 + 40);
       ctx.restore();
     }
 
@@ -552,6 +585,11 @@ function draw(){
       drawNoFaceState(ctx, img, W, H);
       return;
     }
+
+    download.disabled = false;
+    headSlider.disabled = false;
+    topTrimSlider.disabled = false;
+    sizeSlider.disabled = false;
 
     if(SPLIT_VIEW){
       // LEFT: original
@@ -834,6 +872,7 @@ function draw(){
   };
   
   img.onload = async ()=>{
+    previewMessage.hidden = true;
     await detectFace();
     draw();
   };
