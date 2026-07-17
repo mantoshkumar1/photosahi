@@ -386,27 +386,32 @@ function issue_analyzer({
 
   // System constraints
   if(noVerticalMove && noZoomPossible){
-    messages.push("Framing locked");
+    messages.push("Framing is locked — choose a photo with more space around the head");
   } else if(noVerticalMove){
-    messages.push("No vertical movement");
+    messages.push("Vertical adjustment unavailable — choose a photo with more space above and below");
   } else if(noZoomPossible){
-    messages.push("Zoom limited");
+    messages.push("Zoom is limited — choose a photo with more space around the head");
   }
 
   // Tilt Check
   if(Math.abs(angle) > 0.25){
-    messages.push("Tilt corrected");
+    messages.push("Tilt was corrected — review the preview before downloading");
   }
 
   // Face size
   if(face){
     const ratio = face.height / imgHeight;
-    if(ratio < 0.15) messages.push("Face too small");
-    else if(ratio > 0.65) messages.push("Face too large");
+    if(ratio < 0.15) messages.push("Face is too small — zoom in or choose a closer photo");
+    else if(ratio > 0.65) messages.push("Face is too large — zoom out or choose a photo taken farther away");
   }
 
   if(statusText){
     statusText.innerText = messages.join(" • ");
+    if(messages.length){
+      statusText.dataset.tone = "warning";
+    }else{
+      delete statusText.dataset.tone;
+    }
   }
 }
   /* =========================
@@ -805,19 +810,6 @@ function draw(){
       offsetX, 0,
       W, H
     );
-
-    // ===== MODE LABEL (OVERRIDE / ADD) =====
-    if(docType.value.includes("LinkedIn")){
-      if(!statusText.innerText){
-        statusText.innerText = "Optimized for LinkedIn";
-      }
-    }
-
-    if(docType.value.includes("Microsoft Teams")){
-      if(!statusText.innerText){
-        statusText.innerText = "Optimized for MS Teams";
-      }
-    }
 
     // // ===== BACKGROUND CHECK (FINAL OUTPUT) =====
     // const bgMsg = getBackgroundMessageFromCrop(
