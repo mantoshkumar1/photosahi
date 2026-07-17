@@ -467,7 +467,7 @@ function issue_analyzer({
   noVerticalMove,
   noZoomPossible
 }) {
-  let messages = [];
+  const messages = [];
 
   // System constraints
   if(noVerticalMove && noZoomPossible){
@@ -478,11 +478,6 @@ function issue_analyzer({
     messages.push("Zoom is limited — choose a photo with more space around the head");
   }
 
-  // Tilt Check
-  if(Math.abs(angle) > 0.25){
-    messages.push("Tilt was corrected — review the preview before downloading");
-  }
-
   // Face size
   if(face){
     const ratio = face.height / imgHeight;
@@ -491,11 +486,13 @@ function issue_analyzer({
   }
 
   if(statusText){
-    statusText.innerText = messages.join(" • ");
     if(messages.length){
+      statusText.innerText = messages.join(" • ");
       statusText.dataset.tone = "warning";
     }else{
-      delete statusText.dataset.tone;
+      statusText.innerText =
+        "Photo appears suitable based on the checks available. Review the preview before downloading.";
+      statusText.dataset.tone = "success";
     }
   }
 }

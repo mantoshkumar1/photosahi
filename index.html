@@ -114,6 +114,11 @@
     <p class="feedbackIntro">Tell us what happened or what would make PhotoSahi better.</p>
 
     <form id="feedbackForm">
+      <div class="feedbackHoneypot" aria-hidden="true">
+        <label for="feedbackWebsite">Leave this field empty</label>
+        <input id="feedbackWebsite" name="_gotcha" type="text" tabindex="-1" autocomplete="off">
+      </div>
+
       <label class="feedbackField" for="feedbackType">
         <span>What is this about?</span>
         <select id="feedbackType" name="type" required>
